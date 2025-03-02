@@ -1,0 +1,34 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # 设置为你希望自动更新的分支，通常是 `main` 分支
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 运行环境
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3  # 检出仓库代码
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # 设置 Node.js 的版本（根据你的项目需求调整）
+
+      - name: Install dependencies
+        run: npm install  # 安装依赖项（如果需要）
+
+      - name: Build and export static files
+        run: |
+          npm run build  # 根据你的项目构建静态文件
+          npm run export  # 导出静态文件（如果你使用 Next.js）
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # 使用 GitHub token 提交更新
+          publish_dir: ./out  # 设置静态文件的目录（`next export` 后，静态文件会在 `out` 文件夹）
+          destination_branch: gh-pages  # 将静态文件推送到 `gh-pages` 分支
